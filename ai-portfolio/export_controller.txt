@@ -1,0 +1,3 @@
+﻿// Add this to the avatar-chat.js file after initializing the controller:
+window.avatarController = avatarController;
+console.log('Avatar controller exposed as window.avatarController for testing');

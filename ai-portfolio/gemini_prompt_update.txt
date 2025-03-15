@@ -1,0 +1,83 @@
+﻿    def get_system_prompt(self, personal_data: Dict[str, Any]) -> str:
+        """Create a system prompt with personal information"""
+        # Verify personal data is loaded correctly
+        basics = personal_data.get("basics", {})
+        name = basics.get("name", "Unknown")
+        
+        print(f"Creating system prompt for: {name}")
+        
+        # Format skills section
+        skills_section = ""
+        for skill in personal_data.get("skills", []):
+            keywords = ", ".join(skill.get("keywords", []))
+            skills_section += f"- {skill.get('name', '')} ({skill.get('level', '')}): {keywords}\n"
+        
+        # Format projects section
+        projects_section = ""
+        for project in personal_data.get("projects", []):
+            techs = ", ".join(project.get("technologies", []))
+            projects_section += f"- {project.get('name', '')}: {project.get('description', '')}. Technologies: {techs}\n"
+        
+        # Format experience section
+        experience_section = ""
+        for exp in personal_data.get("experience", []):
+            experience_section += f"- {exp.get('position', '')} at {exp.get('company', '')} ({exp.get('startDate', '')} to {exp.get('endDate', '')}): {exp.get('summary', '')}\n"
+        
+        # Format education section
+        education_section = ""
+        for edu in personal_data.get("education", []):
+            education_section += f"- {edu.get('studyType', '')} in {edu.get('area', '')} from {edu.get('institution', '')} ({edu.get('startDate', '')} to {edu.get('endDate', '')})\n"
+        
+        # Format FAQ section
+        faq_section = ""
+        for faq in personal_data.get("faq", []):
+            faq_section += f"Q: {faq.get('question', '')}\nA: {faq.get('answer', '')}\n\n"
+        
+        # Build the full system prompt
+        prompt = f"""You are {name}'s digital representative. ALWAYS speak in FIRST PERSON as if you ARE {name} themselves.
+
+Here is information about you ({name}) that you should use to answer questions:
+
+Your Name: {name}
+Your Title: {basics.get('title', 'Unknown')}
+Your Summary: {basics.get('summary', 'Unknown')}
+Your Location: {basics.get('location', 'Unknown')}
+
+Your Skills: 
+{skills_section}
+
+Your Projects:
+{projects_section}
+
+Your Experience:
+{experience_section}
+
+Your Education:
+{education_section}
+
+FAQs About You:
+{faq_section}
+
+Key instructions:
+1. ALWAYS respond in Czech language, even if the user asks in English
+2. Keep responses SHORT and CONVERSATIONAL - no more than 3 sentences when possible
+3. Use casual, friendly Czech language as if you're talking to a friend
+4. ALWAYS speak in FIRST PERSON - use "já", "moje", "mám", "dělám", etc.
+5. NEVER say "Jan Novák má" or refer to yourself in third person
+6. ALWAYS say "Já mám", "Moje zkušenosti", "Pracoval jsem", etc.
+7. Be concise and direct - avoid formal language
+8. Never identify yourself as an AI - respond as if you ARE the actual person
+9. Use appropriate Czech grammar and natural expressions
+
+Examples of correct first-person responses:
+- "Ano, pracoval jsem na projektu AI Portfolio Assistant."
+- "Mám zkušenosti s Reactem a Node.js."
+- "Vystudoval jsem informatiku na České technické univerzitě."
+- "Momentálně pracuji jako Senior Developer v Technologie s.r.o."
+"""
+        
+        # Debug - save the prompt to a file for inspection
+        with open('debug_prompt.txt', 'w', encoding='utf-8') as f:
+            f.write(prompt)
+            
+        return prompt

@@ -1,0 +1,153 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Moje Portfolio{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/avatar.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', path='css/voice-controls.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', path='css/avatar-animations.css') }}">
+<style>
+.debug-panel {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-top: 20px;
+    border-radius: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+.speech-bubble {
+    position: relative;
+    background: #f0f0f0;
+    border-radius: 15px;
+    padding: 15px;
+    margin-top: 20px;
+    display: none;
+}
+.speech-bubble:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border: 15px solid transparent;
+    border-top-color: #f0f0f0;
+    border-bottom: 0;
+    margin-left: -15px;
+    margin-bottom: -15px;
+}
+
+.avatar-container {
+    position: relative;
+    width: 300px;
+    height: 400px;
+    margin: 0 auto;
+}
+
+/* Testing buttons with better styling */
+.test-controls {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.test-controls h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #333;
+}
+
+.test-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.test-button {
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.test-button:hover {
+    background-color: #e0e0e0;
+}
+
+.test-button:active {
+    background-color: #d0d0d0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="main">
+    <h1 class="title">Vítejte na mém osobním webu</h1>
+    
+    <p class="description">
+        Moje projekty, zkušenosti a dovednosti - zeptejte se mě na cokoliv
+    </p>
+    
+    <div class="avatar-section">
+        <div class="avatar-container" id="avatar-container">
+            <!-- Directly include SVG avatar -->
+            {% include 'avatar_include.html' %}
+            
+            <div class="speech-bubble" id="speech-bubble">
+                Ahoj! Jsem Jan, těší mě.
+            </div>
+        </div>
+        
+        <div class="interaction-panel">
+            <h3>Popovídejme si</h3>
+            <form id="chat-form" class="chat-form">
+                <input 
+                    type="text" 
+                    id="text-input" 
+                    class="text-input" 
+                    placeholder="Napiš mi zprávu..."
+                >
+                <button type="button" id="send-button" class="send-button">Odeslat</button>
+                <button type="button" id="speech-button" class="speech-button">🎤</button>
+            </form>
+            
+            <!-- Animation Test Controls -->
+            <div class="test-controls">
+                <h4>Test animací avatara</h4>
+                <div class="test-buttons">
+                    <button type="button" class="test-button" data-gesture="wave">👋 Mávání</button>
+                    <button type="button" class="test-button" data-gesture="nod">👍 Přikývnutí</button>
+                    <button type="button" class="test-button" data-gesture="shake">👎 Zavrtění</button>
+                    <button type="button" class="test-button" data-gesture="shrug">🤷 Pokrčení</button>
+                    <button type="button" class="test-button" data-expression="happy">😊 Radost</button>
+                    <button type="button" class="test-button" data-expression="sad">😔 Smutek</button>
+                    <button type="button" class="test-button" data-expression="surprised">😮 Překvapení</button>
+                    <button type="button" class="test-button" data-expression="thinking">🤔 Přemýšlení</button>
+                </div>
+            </div>
+            
+            <!-- Voice Controls -->
+            {% include 'voice_controls.html' %}
+            
+            <div class="debug-panel" id="avatar-status">
+                <h4>Ladící informace</h4>
+                <p>Čekání na interakci...</p>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/enhanced-avatar-controller.js') }}"></script>
+<script src="{{ url_for('static', path='js/avatar-chat.js') }}"></script>
+<script src="{{ url_for('static', path='js/voice-controls.js') }}"></script>
+<script src="{{ url_for('static', path='js/animation-test.js') }}"></script>
+{% endblock %}

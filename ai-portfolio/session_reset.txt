@@ -1,0 +1,4 @@
+﻿// Add this to the top of avatar-chat.js
+// Clear previous sessions to use new prompt approach
+localStorage.removeItem('chatSessionId');
+console.log('Cleared previous chat sessions');

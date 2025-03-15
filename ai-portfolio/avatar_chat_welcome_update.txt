@@ -1,0 +1,31 @@
+﻿// If there's no session, send an empty message to get a welcome response
+if (!sessionId) {
+    // Send a special greeting request with slight delay to ensure page is loaded
+    setTimeout(() => {
+        fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                // Use a prompt that forces first-person
+                message: "Představ se mi, prosím tě",
+                session_id: null
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Save session ID
+            sessionId = data.session_id;
+            localStorage.setItem('chatSessionId', sessionId);
+            
+            // Speak the welcome message
+            speakText(data.response);
+        })
+        .catch(error => {
+            console.error('Error getting welcome message:', error);
+            // Fallback welcome message
+            speakText("Ahoj! Jsem Jan Novák. Rád tě poznávám! Co bys chtěl vědět o mně nebo mých projektech?");
+        });
+    }, 1000);
+}

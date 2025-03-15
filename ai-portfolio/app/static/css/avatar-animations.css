@@ -1,0 +1,197 @@
+﻿/* Avatar Animations */
+@keyframes blink {
+  0% { opacity: 0; }
+  5% { opacity: 1; }
+  15% { opacity: 1; }
+  20% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@keyframes headBobble {
+  0% { transform: rotate(0deg) translateY(0px); }
+  25% { transform: rotate(2deg) translateY(-2px); }
+  75% { transform: rotate(-2deg) translateY(2px); }
+  100% { transform: rotate(0deg) translateY(0px); }
+}
+
+@keyframes breathe {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(2px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes waveHand {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-20deg); }
+  50% { transform: rotate(0deg); }
+  75% { transform: rotate(-20deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes nodHead {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(5deg); }
+  75% { transform: rotate(-3deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes shakeHead {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg); }
+  50% { transform: rotate(0deg); }
+  75% { transform: rotate(5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes shrug {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes pointRight {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(20deg); }
+}
+
+@keyframes pointLeft {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-20deg); }
+}
+
+@keyframes excited {
+  0% { transform: rotate(0deg) translateY(0); }
+  25% { transform: rotate(3deg) translateY(-5px); }
+  50% { transform: rotate(-3deg) translateY(-5px); }
+  75% { transform: rotate(3deg) translateY(-5px); }
+  100% { transform: rotate(0deg) translateY(0); }
+}
+
+/* Apply animations */
+#left-eyelid.blink, #right-eyelid.blink {
+  animation: blink 4s infinite;
+}
+
+#head-group.bobble {
+  animation: headBobble 4s ease-in-out infinite;
+}
+
+#body.breathe {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+#right-forearm.wave {
+  animation: waveHand 1.5s ease-in-out;
+  transform-origin: top;
+}
+
+#head-group.nod {
+  animation: nodHead 2s ease-in-out;
+  transform-origin: center bottom;
+}
+
+#head-group.shake {
+  animation: shakeHead 2s ease-in-out;
+  transform-origin: center bottom;
+}
+
+#right-arm.shrug, #left-arm.shrug {
+  animation: shrug 1.5s ease-in-out;
+}
+
+#right-forearm.point {
+  animation: pointRight 0.5s ease-in-out forwards;
+  transform-origin: top;
+}
+
+#left-forearm.point {
+  animation: pointLeft 0.5s ease-in-out forwards;
+  transform-origin: top;
+}
+
+#avatar-main.excited {
+  animation: excited 1s ease-in-out;
+}
+
+/* Viseme classes for lip syncing */
+.viseme-a #mouth-current {
+  d: path('M120,160 Q150,185 180,160 Q150,200 120,160');
+  fill: #701f29;
+}
+
+.viseme-e #mouth-current {
+  d: path('M120,160 Q150,175 180,160 Q150,185 120,160');
+  fill: #701f29;
+}
+
+.viseme-i #mouth-current {
+  d: path('M130,160 Q150,165 170,160 Q150,170 130,160');
+  fill: #701f29;
+}
+
+.viseme-o #mouth-current {
+  d: path('M130,155 Q150,180 170,155 Q150,195 130,155');
+  fill: #701f29;
+}
+
+.viseme-u #mouth-current {
+  d: path('M135,160 Q150,170 165,160 Q150,180 135,160');
+  fill: #701f29;
+}
+
+.viseme-m #mouth-current {
+  d: path('M120,160 L180,160');
+  fill: none;
+}
+
+/* Expressions */
+.expression-happy #mouth-current {
+  d: path('M120,155 Q150,175 180,155');
+  fill: none;
+}
+
+.expression-sad #mouth-current {
+  d: path('M120,165 Q150,155 180,165');
+  fill: none;
+}
+
+.expression-happy #left-eyebrow {
+  d: path('M100,95 Q120,85 140,100');
+}
+
+.expression-happy #right-eyebrow {
+  d: path('M160,100 Q180,85 200,95');
+}
+
+.expression-surprised #mouth-current {
+  d: path('M130,160 Q150,190 170,160 Q150,195 130,160');
+  fill: #701f29;
+}
+
+.expression-surprised #left-eyebrow {
+  d: path('M100,85 Q120,75 140,85');
+}
+
+.expression-surprised #right-eyebrow {
+  d: path('M160,85 Q180,75 200,85');
+}
+
+.expression-thinking #right-eyebrow {
+  d: path('M160,90 Q180,80 200,90');
+}
+
+.expression-angry #left-eyebrow {
+  d: path('M100,95 Q120,85 140,90');
+}
+
+.expression-angry #right-eyebrow {
+  d: path('M160,90 Q180,85 200,95');
+}
+
+.expression-confused #left-eyebrow {
+  d: path('M100,90 Q120,85 140,95');
+}
+
+.expression-confused #right-eyebrow {
+  d: path('M160,95 Q180,85 200,90');
+}

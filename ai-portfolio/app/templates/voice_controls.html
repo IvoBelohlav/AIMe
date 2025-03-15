@@ -1,0 +1,19 @@
+﻿<div class="voice-control-panel">
+    <h3>Nastavení hlasu</h3>
+    <div class="voice-setting">
+        <label for="voice-select">Vyberte hlas:</label>
+        <select id="voice-select" class="voice-select">
+            <option value="Czech Female">Čeština - Žena</option>
+            <option value="Czech Male">Čeština - Muž</option>
+        </select>
+    </div>
+    <div class="voice-setting">
+        <label for="rate-slider">Rychlost: <span id="rate-value">1.0</span></label>
+        <input type="range" id="rate-slider" min="0.5" max="1.5" step="0.1" value="1.0">
+    </div>
+    <div class="voice-setting">
+        <label for="pitch-slider">Výška: <span id="pitch-value">1.0</span></label>
+        <input type="range" id="pitch-slider" min="0.5" max="2" step="0.1" value="1.0">
+    </div>
+    <button id="test-voice-btn" class="test-voice-btn">Vyzkoušet hlas</button>
+</div>

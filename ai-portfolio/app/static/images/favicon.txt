@@ -1,0 +1,2 @@
+﻿This is a placeholder for favicon.
+Please replace with a proper .ico file.

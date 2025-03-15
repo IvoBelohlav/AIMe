@@ -1,0 +1,6 @@
+﻿# Add this to your main.py file
+
+@app.get("/favicon.ico")
+async def favicon():
+    """Serve a simple response for favicon requests"""
+    return Response(status_code=204)  # No content response

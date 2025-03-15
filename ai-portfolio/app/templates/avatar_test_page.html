@@ -1,0 +1,270 @@
+﻿<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avatar Animation Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .avatar-container {
+            width: 300px;
+            height: 400px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            position: relative;
+        }
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        button {
+            padding: 8px 15px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #e0e0e0;
+        }
+        #log {
+            margin-top: 20px;
+            padding: 10px;
+            height: 200px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/avatar-animations.css') }}">
+</head>
+<body>
+    <h1>Avatar Animation Test</h1>
+    
+    <div class="avatar-container" id="avatar-container">
+        <!-- SVG will be inserted here -->
+    </div>
+    
+    <div class="controls">
+        <button onclick="testGesture('wave')">Wave</button>
+        <button onclick="testGesture('nod')">Nod</button>
+        <button onclick="testGesture('shake')">Shake</button>
+        <button onclick="testGesture('shrug')">Shrug</button>
+        <button onclick="testExpression('happy')">Happy</button>
+        <button onclick="testExpression('sad')">Sad</button>
+        <button onclick="testExpression('surprised')">Surprised</button>
+        <button onclick="testExpression('thinking')">Thinking</button>
+        <button onclick="testSpeech('Ahoj, jak se máš? Já jsem Jan Novák.')">Test Speech</button>
+    </div>
+    
+    <div id="log">
+        <p>Animation test log:</p>
+    </div>
+    
+    <script>
+        // Log function
+        function log(message) {
+            const logElem = document.getElementById('log');
+            logElem.innerHTML += <p></p>;
+            logElem.scrollTop = logElem.scrollHeight;
+        }
+        
+        // Load SVG directly into the page
+        function loadSvg() {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', '{{ url_for("static", path="images/avatar.svg") }}', true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    document.getElementById('avatar-container').innerHTML = xhr.responseText;
+                    log('SVG loaded successfully');
+                    initController();
+                }
+            };
+            xhr.onerror = function() {
+                log('Error loading SVG');
+            };
+            xhr.send();
+        }
+        
+        // Initialize controller after SVG loads
+        function initController() {
+            window.testController = {
+                performGesture: function(gesture) {
+                    log(Performing gesture: );
+                    
+                    const avatarMain = document.getElementById('avatar-main');
+                    const headGroup = document.getElementById('head-group');
+                    const leftArm = document.getElementById('left-arm');
+                    const rightArm = document.getElementById('right-arm');
+                    const rightForearm = document.getElementById('right-forearm');
+                    const leftForearm = document.getElementById('left-forearm');
+                    
+                    // Remove existing animations
+                    ['nod', 'shake', 'wave', 'shrug', 'point'].forEach(cls => {
+                        if (headGroup) headGroup.classList.remove(cls);
+                        if (leftArm) leftArm.classList.remove(cls, 'shrug');
+                        if (rightArm) rightArm.classList.remove(cls, 'shrug');
+                        if (leftForearm) leftForearm.classList.remove('point');
+                        if (rightForearm) rightForearm.classList.remove('wave', 'point');
+                    });
+                    
+                    // Apply animation based on gesture
+                    switch(gesture) {
+                        case 'wave':
+                            if (rightForearm) {
+                                rightForearm.classList.add('wave');
+                                setTimeout(() => rightForearm.classList.remove('wave'), 2000);
+                            } else {
+                                log('Error: rightForearm element not found');
+                            }
+                            break;
+                        case 'nod':
+                            if (headGroup) {
+                                headGroup.classList.add('nod');
+                                setTimeout(() => headGroup.classList.remove('nod'), 2000);
+                            } else {
+                                log('Error: headGroup element not found');
+                            }
+                            break;
+                        case 'shake':
+                            if (headGroup) {
+                                headGroup.classList.add('shake');
+                                setTimeout(() => headGroup.classList.remove('shake'), 2000);
+                            } else {
+                                log('Error: headGroup element not found');
+                            }
+                            break;
+                        case 'shrug':
+                            if (leftArm && rightArm) {
+                                leftArm.classList.add('shrug');
+                                rightArm.classList.add('shrug');
+                                setTimeout(() => {
+                                    leftArm.classList.remove('shrug');
+                                    rightArm.classList.remove('shrug');
+                                }, 2000);
+                            } else {
+                                log('Error: arm elements not found');
+                            }
+                            break;
+                        default:
+                            log(Unknown gesture: );
+                    }
+                },
+                
+                setExpression: function(expression) {
+                    log(Setting expression: );
+                    
+                    const avatarMain = document.getElementById('avatar-main');
+                    if (!avatarMain) {
+                        log('Error: avatarMain element not found');
+                        return;
+                    }
+                    
+                    // Remove existing expressions
+                    ['expression-happy', 'expression-sad', 'expression-surprised', 
+                     'expression-thinking', 'expression-angry', 'expression-confused'].forEach(cls => {
+                        avatarMain.classList.remove(cls);
+                    });
+                    
+                    // Apply new expression
+                    if (expression !== 'neutral') {
+                        avatarMain.classList.add('expression-' + expression);
+                    }
+                },
+                
+                speak: function(text) {
+                    log(Speaking: "");
+                    
+                    // Simple visualization of mouth movement
+                    const mouthCurrent = document.getElementById('mouth-current');
+                    const avatarMain = document.getElementById('avatar-main');
+                    
+                    if (!avatarMain || !mouthCurrent) {
+                        log('Error: mouth elements not found');
+                        return;
+                    }
+                    
+                    const chars = text.split('');
+                    let index = 0;
+                    
+                    // Animate mouth shapes based on characters
+                    const animate = () => {
+                        if (index >= chars.length) {
+                            // Reset mouth at the end
+                            ['viseme-a', 'viseme-e', 'viseme-i', 'viseme-o', 'viseme-u', 'viseme-m']
+                                .forEach(cls => avatarMain.classList.remove(cls));
+                            return;
+                        }
+                        
+                        const char = chars[index].toLowerCase();
+                        
+                        // Remove existing viseme classes
+                        ['viseme-a', 'viseme-e', 'viseme-i', 'viseme-o', 'viseme-u', 'viseme-m']
+                            .forEach(cls => avatarMain.classList.remove(cls));
+                        
+                        // Add appropriate viseme class
+                        if ('aá'.includes(char)) {
+                            avatarMain.classList.add('viseme-a');
+                        } else if ('eéě'.includes(char)) {
+                            avatarMain.classList.add('viseme-e');
+                        } else if ('iíyý'.includes(char)) {
+                            avatarMain.classList.add('viseme-i');
+                        } else if ('oó'.includes(char)) {
+                            avatarMain.classList.add('viseme-o');
+                        } else if ('uúů'.includes(char)) {
+                            avatarMain.classList.add('viseme-u');
+                        } else if ('mbp'.includes(char)) {
+                            avatarMain.classList.add('viseme-m');
+                        }
+                        
+                        index++;
+                        setTimeout(animate, 80); // Advance every 80ms
+                    };
+                    
+                    // Start animation
+                    animate();
+                }
+            };
+            
+            log('Test controller initialized');
+        }
+        
+        // Test functions
+        function testGesture(gesture) {
+            if (window.testController) {
+                window.testController.performGesture(gesture);
+            } else {
+                log('Error: Test controller not initialized');
+            }
+        }
+        
+        function testExpression(expression) {
+            if (window.testController) {
+                window.testController.setExpression(expression);
+            } else {
+                log('Error: Test controller not initialized');
+            }
+        }
+        
+        function testSpeech(text) {
+            if (window.testController) {
+                window.testController.speak(text);
+            } else {
+                log('Error: Test controller not initialized');
+            }
+        }
+        
+        // Load SVG when page loads
+        document.addEventListener('DOMContentLoaded', loadSvg);
+    </script>
+</body>
+</html>

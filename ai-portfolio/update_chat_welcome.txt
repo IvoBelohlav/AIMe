@@ -1,0 +1,10 @@
+﻿# Update welcome message to be in Czech
+if not session_id or session_id not in conversations:
+    session_id = str(uuid.uuid4())
+    
+    # Get name from personal data
+    name = personal_data.get("basics", {}).get("name", "Portfolio Owner")
+    
+    # Add welcome message for new conversation in Czech
+    welcome_msg = f"Ahoj! Jsem digitální asistent portfolia Jana Nováka. Rád ti pomůžu s informacemi o jeho zkušenostech a projektech. Jak ti mohu pomoci?"
+    add_message(session_id, "assistant", welcome_msg)

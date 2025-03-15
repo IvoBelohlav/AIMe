@@ -1,0 +1,114 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400" id="avatar">
+  <!-- Definitions for reuse -->
+  <defs>
+    <!-- Mouth shapes for different phonemes -->
+    <g id="mouth-shapes">
+      <path id="mouth-rest" d="M120,160 Q150,170 180,160" fill="none" stroke="#8c5a46" stroke-width="3" />
+      <path id="mouth-a" d="M120,160 Q150,185 180,160 Q150,200 120,160" fill="#701f29" stroke="#8c5a46" stroke-width="2" />
+      <path id="mouth-e" d="M120,160 Q150,175 180,160 Q150,185 120,160" fill="#701f29" stroke="#8c5a46" stroke-width="2" />
+      <path id="mouth-i" d="M130,160 Q150,165 170,160 Q150,170 130,160" fill="#701f29" stroke="#8c5a46" stroke-width="2" />
+      <path id="mouth-o" d="M130,155 Q150,180 170,155 Q150,195 130,155" fill="#701f29" stroke="#8c5a46" stroke-width="2" />
+      <path id="mouth-u" d="M135,160 Q150,170 165,160 Q150,180 135,160" fill="#701f29" stroke="#8c5a46" stroke-width="2" />
+      <path id="mouth-m" d="M120,160 L180,160" stroke="#8c5a46" stroke-width="3" fill="none" />
+      <path id="mouth-smile" d="M120,155 Q150,175 180,155" fill="none" stroke="#8c5a46" stroke-width="3" />
+      <path id="mouth-sad" d="M120,165 Q150,155 180,165" fill="none" stroke="#8c5a46" stroke-width="3" />
+    </g>
+    
+    <!-- Eyebrow shapes for expressions -->
+    <g id="eyebrow-shapes">
+      <path id="eyebrow-normal-left" d="M100,95 Q120,85 140,95" fill="none" stroke="#2b1700" stroke-width="3" />
+      <path id="eyebrow-normal-right" d="M160,95 Q180,85 200,95" fill="none" stroke="#2b1700" stroke-width="3" />
+      <path id="eyebrow-raised-left" d="M100,90 Q120,75 140,90" fill="none" stroke="#2b1700" stroke-width="3" />
+      <path id="eyebrow-raised-right" d="M160,90 Q180,75 200,90" fill="none" stroke="#2b1700" stroke-width="3" />
+      <path id="eyebrow-concerned-left" d="M100,95 Q120,85 140,90" fill="none" stroke="#2b1700" stroke-width="3" />
+      <path id="eyebrow-concerned-right" d="M160,90 Q180,85 200,95" fill="none" stroke="#2b1700" stroke-width="3" />
+      <path id="eyebrow-angry-left" d="M110,95 Q120,85 140,95" fill="none" stroke="#2b1700" stroke-width="3" />
+      <path id="eyebrow-angry-right" d="M160,95 Q180,85 190,95" fill="none" stroke="#2b1700" stroke-width="3" />
+    </g>
+  </defs>
+
+  <!-- Main avatar group with transform origin for head movement -->
+  <g id="avatar-main" transform-origin="150 150">
+    <!-- Body - more articulated for movement -->
+    <g id="body" transform-origin="150 250">
+      <!-- Torso -->
+      <path id="torso" d="M100,230 L135,230 L135,220 L165,220 L165,230 L200,230 L200,300 L100,300" fill="#3f51b5" />
+      
+      <!-- Arms with articulated joints for gestures -->
+      <g id="arms">
+        <!-- Left arm with joints for animation -->
+        <g id="left-arm" transform-origin="105 240">
+          <path id="left-upper-arm" d="M105,240 L80,290" stroke="#daa17f" stroke-width="20" stroke-linecap="round" fill="none" />
+          <g id="left-forearm" transform-origin="80 290">
+            <path d="M80,290 L70,340" stroke="#daa17f" stroke-width="18" stroke-linecap="round" fill="none" />
+            <g id="left-hand" transform-origin="70 340">
+              <circle cx="70" cy="340" r="10" fill="#daa17f" />
+              <!-- Left hand fingers can be added here for more detailed gestures -->
+            </g>
+          </g>
+        </g>
+        
+        <!-- Right arm with joints for animation -->
+        <g id="right-arm" transform-origin="195 240">
+          <path id="right-upper-arm" d="M195,240 L220,290" stroke="#daa17f" stroke-width="20" stroke-linecap="round" fill="none" />
+          <g id="right-forearm" transform-origin="220 290">
+            <path d="M220,290 L230,340" stroke="#daa17f" stroke-width="18" stroke-linecap="round" fill="none" />
+            <g id="right-hand" transform-origin="230 340">
+              <circle cx="230" cy="340" r="10" fill="#daa17f" />
+              <!-- Right hand fingers can be added here for more detailed gestures -->
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+
+    <!-- Head group for head movements -->
+    <g id="head-group" transform-origin="150 120">
+      <!-- Base head -->
+      <ellipse id="head" cx="150" cy="120" rx="70" ry="90" fill="#daa17f" />
+      
+      <!-- Neck -->
+      <rect id="neck" x="135" y="200" width="30" height="30" fill="#daa17f" />
+      
+      <!-- Hair -->
+      <path id="hair" d="M150,30 C100,30 70,60 70,100 C70,120 80,140 90,150 C90,130 100,120 110,110 C110,140 130,150 150,150 C170,150 190,140 190,110 C200,120 210,130 210,150 C220,140 230,120 230,100 C230,60 200,30 150,30 Z" fill="#2b1700" />
+      
+      <!-- Eyes group for eye movements -->
+      <g id="eyes-group" transform-origin="150 110">
+        <!-- Left eye -->
+        <g id="left-eye">
+          <ellipse cx="120" cy="110" rx="15" ry="10" fill="white" stroke="#888" stroke-width="0.5" />
+          <circle id="left-pupil" cx="120" cy="110" r="5" fill="#301000" />
+          <path id="left-eyebrow" d="M100,95 Q120,85 140,95" fill="none" stroke="#2b1700" stroke-width="3" />
+          <path id="left-eyelid" d="M105,110 Q120,110 135,110" stroke="#daa17f" fill="#daa17f" stroke-width="0.5" opacity="0" />
+        </g>
+        
+        <!-- Right eye -->
+        <g id="right-eye">
+          <ellipse cx="180" cy="110" rx="15" ry="10" fill="white" stroke="#888" stroke-width="0.5" />
+          <circle id="right-pupil" cx="180" cy="110" r="5" fill="#301000" />
+          <path id="right-eyebrow" d="M160,95 Q180,85 200,95" fill="none" stroke="#2b1700" stroke-width="3" />
+          <path id="right-eyelid" d="M165,110 Q180,110 195,110" stroke="#daa17f" fill="#daa17f" stroke-width="0.5" opacity="0" />
+        </g>
+      </g>
+      
+      <!-- Nose -->
+      <path id="nose" d="M150,115 Q155,140 145,140" fill="none" stroke="#a37e65" stroke-width="2" />
+      
+      <!-- Mouth with various expressions -->
+      <g id="mouth-group" transform-origin="150 160">
+        <!-- Default closed mouth will be shown, others hidden via JS -->
+        <path id="mouth-current" d="M120,160 Q150,170 180,160" fill="none" stroke="#8c5a46" stroke-width="3" />
+      </g>
+      
+      <!-- Glasses -->
+      <g id="glasses">
+        <rect x="100" y="105" width="40" height="25" rx="5" ry="5" fill="none" stroke="#444" stroke-width="2" />
+        <rect x="160" y="105" width="40" height="25" rx="5" ry="5" fill="none" stroke="#444" stroke-width="2" />
+        <line x1="140" y1="115" x2="160" y2="115" stroke="#444" stroke-width="2" />
+        <line x1="98" y1="110" x2="80" y2="105" stroke="#444" stroke-width="2" />
+        <line x1="202" y1="110" x2="220" y2="105" stroke="#444" stroke-width="2" />
+      </g>
+    </g>
+  </g>
+</svg>

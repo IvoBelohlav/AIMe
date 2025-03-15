@@ -1,0 +1,4 @@
+﻿@app.get("/avatar-test")
+async def avatar_test_page(request: Request):
+    """Dedicated avatar animation test page"""
+    return templates.TemplateResponse("avatar_test_page.html", {"request": request})

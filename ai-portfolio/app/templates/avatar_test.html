@@ -1,0 +1,146 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Avatar Test Page{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/avatar.css') }}">
+<style>
+  .test-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .control-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px 0;
+  }
+  
+  .control-panel button {
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  
+  .control-panel button:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .test-form {
+    margin: 20px 0;
+  }
+  
+  .test-form input {
+    width: 70%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .test-form button {
+    padding: 10px 15px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    margin-left: 10px;
+    cursor: pointer;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="test-container">
+  <h1>Avatar Test Page</h1>
+  <p>This page lets you test the avatar's animations and responses.</p>
+  
+  <div class="avatar-container">
+    {% include 'avatar_include.html' %}
+    
+    <div class="speech-bubble" id="speech-bubble">
+      Test speech will appear here
+    </div>
+  </div>
+  
+  <div class="control-panel">
+    <button id="test-wave">Wave</button>
+    <button id="test-think">Think</button>
+    <button id="test-excited">Excited</button>
+    <button id="test-happy">Happy Expression</button>
+    <button id="test-thinking">Thinking Expression</button>
+    <button id="test-surprised">Surprised Expression</button>
+    <button id="test-reset">Reset</button>
+  </div>
+  
+  <form class="test-form" id="test-speech-form">
+    <input type="text" id="test-speech-input" placeholder="Enter text for the avatar to speak...">
+    <button type="submit">Speak</button>
+  </form>
+  
+  <div>
+    <h3>Instructions</h3>
+    <ul>
+      <li>Use the buttons above to test different animations and expressions</li>
+      <li>Enter text in the input field to test speech with lip sync</li>
+      <li>The avatar should animate according to your commands</li>
+    </ul>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='js/avatar-controller.js') }}"></script>
+<script src="{{ url_for('static', path='js/speech-mapper.js') }}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize avatar controller
+    const avatarController = new AvatarController();
+    window.avatarController = avatarController; // Expose for testing
+    
+    // Initialize speech mapper
+    const speechMapper = new SpeechMapper(avatarController);
+    
+    // Get DOM elements
+    const waveBut = document.getElementById('test-wave');
+    const thinkBut = document.getElementById('test-think');
+    const excitedBut = document.getElementById('test-excited');
+    const happyBut = document.getElementById('test-happy');
+    const thinkingBut = document.getElementById('test-thinking');
+    const surprisedBut = document.getElementById('test-surprised');
+    const resetBut = document.getElementById('test-reset');
+    const speechForm = document.getElementById('test-speech-form');
+    const speechInput = document.getElementById('test-speech-input');
+    const speechBubble = document.getElementById('speech-bubble');
+    
+    // Set up event listeners
+    waveBut.addEventListener('click', () => avatarController.performGesture('wave'));
+    thinkBut.addEventListener('click', () => avatarController.performGesture('think'));
+    excitedBut.addEventListener('click', () => avatarController.performGesture('excited'));
+    happyBut.addEventListener('click', () => avatarController.setExpression('happy'));
+    thinkingBut.addEventListener('click', () => avatarController.setExpression('thinking'));
+    surprisedBut.addEventListener('click', () => avatarController.setExpression('surprised'));
+    
+    resetBut.addEventListener('click', () => {
+      avatarController.stopSpeaking();
+      document.getElementById('expressions').setAttribute('display', 'none');
+      speechMapper.cancelSpeech();
+      speechBubble.textContent = 'Test speech will appear here';
+      speechBubble.classList.remove('active');
+    });
+    
+    speechForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const text = speechInput.value.trim();
+      if (text) {
+        speechBubble.textContent = text;
+        speechBubble.classList.add('active');
+        speechMapper.speakText(text);
+      }
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,49 @@
+﻿// Function to speak text using ResponsiveVoice or fallback to Web Speech API
+function speakText(text) {
+    // Update the speech bubble
+    if (speechBubble) {
+        speechBubble.textContent = text;
+        speechBubble.style.display = 'block';
+    }
+    
+    // Log status
+    if (statusDiv) {
+        statusDiv.innerHTML += '<p>Speaking: ' + text + '</p>';
+    }
+    
+    // Get voice settings from local storage
+    const voiceType = localStorage.getItem('selectedVoice') || "Czech Female";
+    const rate = parseFloat(localStorage.getItem('speechRate') || "1.0");
+    const pitch = parseFloat(localStorage.getItem('speechPitch') || "1.0");
+    
+    console.log('Voice settings:', { voiceType, rate, pitch });
+    
+    // Use ResponsiveVoice if available
+    if (hasResponsiveVoice) {
+        // Cancel any ongoing speech
+        if (responsiveVoice.isPlaying()) {
+            responsiveVoice.cancel();
+        }
+        
+        // Speak using selected voice
+        responsiveVoice.speak(text, voiceType, {
+            pitch: pitch,
+            rate: rate,
+            volume: 1,
+            onstart: function() {
+                console.log('ResponsiveVoice started speaking');
+            },
+            onend: function() {
+                console.log('ResponsiveVoice finished speaking');
+            },
+            onerror: function(error) {
+                console.error('ResponsiveVoice error:', error);
+                // Fallback to Web Speech API if ResponsiveVoice fails
+                fallbackSpeech(text);
+            }
+        });
+    } else {
+        // Fallback to Web Speech API
+        fallbackSpeech(text);
+    }
+}
