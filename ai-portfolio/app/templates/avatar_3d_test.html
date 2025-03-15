@@ -1,0 +1,92 @@
+﻿{% extends "base.html" %}
+
+{% block title %}3D Avatar Test{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/3d-avatar.css') }}">
+<style>
+  .test-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .avatar-container {
+    width: 300px;
+    height: 400px;
+    margin: 0 auto;
+    position: relative;
+  }
+  
+  .controls {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  button {
+    padding: 8px 15px;
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background: #e0e0e0;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="test-container">
+  <h1>3D Avatar Test</h1>
+  
+  <div class="avatar-container" id="avatar-container">
+    <!-- The 3D avatar will be rendered here -->
+  </div>
+  
+  <div class="controls">
+    <button onclick="testGesture('wave')">Wave</button>
+    <button onclick="testGesture('nod')">Nod</button>
+    <button onclick="testGesture('shake')">Shake</button>
+    <button onclick="testGesture('shrug')">Shrug</button>
+    <button onclick="testExpression('happy')">Happy</button>
+    <button onclick="testExpression('sad')">Sad</button>
+    <button onclick="testExpression('surprised')">Surprised</button>
+    <button onclick="testExpression('thinking')">Thinking</button>
+    <button onclick="testSpeech('Hello there! This is a test of the speech animation system.')">Test Speech</button>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module">
+  import Avatar3DController from '{{ url_for("static", path="js/3d-avatar/Avatar3DController.js") }}';
+  
+  // Initialize the avatar when the page loads
+  document.addEventListener('DOMContentLoaded', () => {
+    window.avatar3D = new Avatar3DController('avatar-container');
+  });
+  
+  // Expose test functions to the global scope
+  window.testGesture = (gesture) => {
+    if (window.avatar3D) {
+      window.avatar3D.performGesture(gesture);
+    }
+  };
+  
+  window.testExpression = (expression) => {
+    if (window.avatar3D) {
+      window.avatar3D.setExpression(expression);
+    }
+  };
+  
+  window.testSpeech = (text) => {
+    if (window.avatar3D) {
+      window.avatar3D.startSpeaking(text);
+    }
+  };
+</script>
+{% endblock %}

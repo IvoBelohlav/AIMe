@@ -148,14 +148,20 @@
                     return;
                 }
                 
-                console.log('Test button clicked:', { gesture, expression });
+                // Get the button text (emoji and label)
+                const buttonText = this.textContent.trim();
+                console.log('Test button clicked:', { gesture, expression, buttonText });
                 
                 if (gesture) {
-                    controller.performGesture(gesture);
+                    // Extract the Czech label without emoji
+                    const gestureName = buttonText.replace(/^.+\s/, '');
+                    controller.performGesture(gestureName);
                 }
                 
                 if (expression) {
-                    controller.setExpression(expression);
+                    // Extract the Czech label without emoji
+                    const expressionName = buttonText.replace(/^.+\s/, '');
+                    controller.setExpression(expressionName);
                 }
             });
         });

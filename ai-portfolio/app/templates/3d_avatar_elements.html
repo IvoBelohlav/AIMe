@@ -1,0 +1,15 @@
+﻿<!-- Add these elements to your index.html file inside the avatar-container div -->
+<div id="avatar-container-2d" style="width: 300px; height: 400px; display: none;">
+    <!-- Your existing 2D SVG avatar -->
+    {% include 'avatar_include.html' %}
+</div>
+
+<div id="avatar-container-3d" style="width: 300px; height: 400px;">
+    <!-- This will be filled by the 3D avatar -->
+</div>
+
+<button id="toggle-avatar-mode" class="avatar-toggle-btn">Toggle 2D/3D Avatar</button>
+
+<!-- Add this to your scripts block -->
+<script type="module" src="{{ url_for('static', path='js/3d-avatar/Avatar3DController.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='js/3d-avatar/AvatarIntegration.js') }}"></script>

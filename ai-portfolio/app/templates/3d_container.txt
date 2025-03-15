@@ -1,0 +1,8 @@
+﻿<!-- Add these elements to your index.html file inside the avatar-container div -->
+<div id="avatar-container-3d" style="width: 300px; height: 400px;">
+    <!-- This will be filled by the 3D avatar -->
+    <div class="avatar-loading">Loading 3D avatar...</div>
+</div>
+
+<!-- Add toggle button if you want to switch between 2D/3D -->
+<button id="toggle-avatar-mode" class="avatar-toggle-btn">Toggle 2D/3D</button>
