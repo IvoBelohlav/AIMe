@@ -1,0 +1,6 @@
+﻿{% block scripts %}
+<script src="{{ url_for('static', path='js/enhanced-avatar-controller.js') }}"></script>
+<script src="{{ url_for('static', path='js/avatar-chat.js') }}"></script>
+<script src="{{ url_for('static', path='js/voice-controls.js') }}"></script>
+<script src="{{ url_for('static', path='js/animation-test.js') }}"></script>
+{% endblock %}

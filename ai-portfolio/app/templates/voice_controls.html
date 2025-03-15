@@ -1,11 +1,63 @@
 ﻿<div class="voice-control-panel">
     <h3>Nastavení hlasu</h3>
     <div class="voice-setting">
+        <label for="voice-engine">Hlasový engine:</label>
+        <select id="voice-engine" class="voice-select">
+            <option value="responsive">ResponsiveVoice</option>
+            <option value="elevenlabs" selected>ElevenLabs (Naturální hlas)</option>
+            <option value="browser">Web Speech API</option>
+        </select>
+    </div>
+    <div class="voice-setting responsive-voices">
         <label for="voice-select">Vyberte hlas:</label>
         <select id="voice-select" class="voice-select">
             <option value="Czech Female">Čeština - Žena</option>
             <option value="Czech Male">Čeština - Muž</option>
+            <option value="UK English Female">Angličtina (UK) - Žena</option>
+            <option value="UK English Male">Angličtina (UK) - Muž</option>
+            <option value="US English Female">Angličtina (US) - Žena</option>
+            <option value="US English Male">Angličtina (US) - Muž</option>
+            <option value="Japanese Female">Japonština - Žena</option>
+            <option value="Japanese Male">Japonština - Muž</option>
         </select>
+    </div>
+    <div class="voice-setting elevenlabs-voices">
+        <label for="elevenlabs-voice-select">ElevenLabs hlas:</label>
+        <select id="elevenlabs-voice-select" class="voice-select">
+            <!-- Natural voices -->
+            <optgroup label="Přirozené hlasy">
+                <option value="21m00Tcm4TlvDq8ikWAM">Rachel (Angličtina - Žena)</option>
+                <option value="AZnzlk1XvdvUeBnXmlld">Domi (Angličtina - Žena)</option>
+                <option value="EXAVITQu4vr4xnSDxMaL">Bella (Angličtina - Žena)</option>
+                <option value="ErXwobaYiN019PkySvjV">Antoni (Angličtina - Muž)</option>
+                <option value="MF3mGyEYCl7XYWbV9V6O">Elli (Angličtina - Žena)</option>
+                <option value="TxGEqnHWrfWFTfGW9XjX">Josh (Angličtina - Muž)</option>
+                <option value="VR6AewLTigWG4xSOukaG">Arnold (Angličtina - Muž)</option>
+                <option value="pNInz6obpgDQGcFmaJgB">Adam (Angličtina - Muž)</option>
+                <option value="yoZ06aMxZJJ28mfd3POQ">Sam (Angličtina - Muž)</option>
+            </optgroup>
+            <!-- Anime style voices -->
+            <optgroup label="Anime styly">
+                <option value="jsCqWAovK2LkecY7zXl4">Anime - Glinda (Nadšená)</option>
+                <option value="XrExE9yKIg1WjnnlVkGX">Anime - Scarlett (Dramatická)</option>
+                <option value="ZQe5CZNOzWyzPSCn5a3c">Anime - Akira (Mladý muž)</option>
+                <option value="gFuasmpJmKzEGJSvJaGW">Anime - Hikari (Mladá žena)</option>
+                <option value="1vgXwJ0wD9EB1zMWATyN">Anime - Chihiro (Veselá)</option>
+            </optgroup>
+            <!-- Multilingual voices -->
+            <optgroup label="Vícejazyčné">
+                <option value="PEJRDbR7x2wSk9ygbVQY">Emily (Angličtina - Žena, Multilingual)</option>
+                <option value="N2lVS1w4EtoT3dr4eOWO">Mateo (Španělština - Muž, Multilingual)</option>
+                <option value="kgG9JrZ3JittQyQtg1QV">Yumiko (Japonština - Žena, Multilingual)</option>
+                <option value="zcQeJjRnwpsyFkAMGHLj">Alex (Němčina - Muž, Multilingual)</option>
+                <option value="IKne3meq5aSn9XLyUdCD">Chen (Čínština - Muž, Multilingual)</option>
+            </optgroup>
+        </select>
+    </div>
+    <div class="voice-setting elevenlabs-api-key">
+        <label for="elevenlabs-api-key">ElevenLabs API klíč:</label>
+        <input type="text" id="elevenlabs-api-key" placeholder="Vložte váš ElevenLabs API klíč" class="input-field">
+        <small>Získáte na <a href="https://elevenlabs.io" target="_blank">elevenlabs.io</a> (dostupné bezplatné kredity)</small>
     </div>
     <div class="voice-setting">
         <label for="rate-slider">Rychlost: <span id="rate-value">1.0</span></label>
@@ -15,5 +67,18 @@
         <label for="pitch-slider">Výška: <span id="pitch-value">1.0</span></label>
         <input type="range" id="pitch-slider" min="0.5" max="2" step="0.1" value="1.0">
     </div>
+    <div class="voice-setting elevenlabs-stability">
+        <label for="stability-slider">Stabilita: <span id="stability-value">0.5</span></label>
+        <input type="range" id="stability-slider" min="0" max="1" step="0.05" value="0.5">
+    </div>
+    <div class="voice-setting elevenlabs-clarity">
+        <label for="clarity-slider">Jasnost: <span id="clarity-value">0.75</span></label>
+        <input type="range" id="clarity-slider" min="0" max="1" step="0.05" value="0.75">
+    </div>
+    <div class="voice-setting elevenlabs-style">
+        <label for="style-slider">Výraznost stylizace: <span id="style-value">0.3</span></label>
+        <input type="range" id="style-slider" min="0" max="1" step="0.05" value="0.3">
+    </div>
     <button id="test-voice-btn" class="test-voice-btn">Vyzkoušet hlas</button>
+    <div id="voice-status" class="voice-status"></div>
 </div>

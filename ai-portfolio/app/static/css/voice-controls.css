@@ -1,49 +1,167 @@
 ﻿.voice-control-panel {
-    background-color: #f9f9f9;
+    background-color: #f8f9fa;
     border-radius: 8px;
-    padding: 15px;
-    margin-top: 15px;
+    padding: 20px;
+    margin-top: 20px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .voice-control-panel h3 {
     margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 16px;
-    color: #333;
+    color: #444;
+    font-size: 18px;
+    margin-bottom: 15px;
 }
 
 .voice-setting {
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .voice-setting label {
     display: block;
     margin-bottom: 5px;
-    font-size: 14px;
+    font-weight: 500;
+    color: #555;
 }
 
-.voice-select {
+.voice-select, .input-field {
     width: 100%;
-    padding: 8px;
-    border-radius: 4px;
+    padding: 8px 12px;
     border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: white;
+    color: #333;
+}
+
+.voice-select:focus, .input-field:focus {
+    border-color: #4a90e2;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+/* Style for option groups */
+optgroup {
+    font-weight: bold;
+    color: #555;
+}
+
+optgroup option {
+    font-weight: normal;
+    padding-left: 15px;
 }
 
 input[type="range"] {
     width: 100%;
+    margin: 10px 0;
+    cursor: pointer;
 }
 
 .test-voice-btn {
-    background-color: #4caf50;
+    background-color: #4a90e2;
     color: white;
     border: none;
-    padding: 8px 15px;
+    padding: 10px 15px;
     border-radius: 4px;
     cursor: pointer;
-    margin-top: 5px;
+    font-size: 14px;
+    transition: background-color 0.3s;
+    width: 100%;
+    margin-top: 15px;
 }
 
 .test-voice-btn:hover {
-    background-color: #45a049;
+    background-color: #3a7bc8;
+}
+
+/* Voice engine highlight */
+#voice-engine {
+    font-weight: bold;
+    border: 2px solid #4a90e2;
+}
+
+/* Voice engine options */
+#voice-engine option {
+    font-weight: normal;
+}
+
+#voice-engine option:checked {
+    font-weight: bold;
+    background-color: #e6f0ff;
+}
+
+small {
+    display: block;
+    color: #777;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+small a {
+    color: #4a90e2;
+    text-decoration: none;
+}
+
+small a:hover {
+    text-decoration: underline;
+}
+
+/* Voice status display */
+.voice-status {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #f0f8ff;
+    border-left: 4px solid #4a90e2;
+    display: none;
+}
+
+.voice-status.error {
+    background-color: #fff0f0;
+    border-left-color: #e74c3c;
+}
+
+.voice-status.success {
+    background-color: #f0fff0;
+    border-left-color: #2ecc71;
+}
+
+/* Conditional display of voice options */
+.elevenlabs-voices, .elevenlabs-api-key, 
+.elevenlabs-stability, .elevenlabs-clarity,
+.elevenlabs-style {
+    display: block; /* Will be controlled by JS */
+}
+
+.voice-engine-browser .responsive-voices,
+.voice-engine-browser .elevenlabs-voices,
+.voice-engine-browser .elevenlabs-api-key,
+.voice-engine-browser .elevenlabs-stability,
+.voice-engine-browser .elevenlabs-clarity,
+.voice-engine-browser .elevenlabs-style {
+    display: none;
+}
+
+.voice-engine-responsive .elevenlabs-voices,
+.voice-engine-responsive .elevenlabs-api-key,
+.voice-engine-responsive .elevenlabs-stability,
+.voice-engine-responsive .elevenlabs-clarity,
+.voice-engine-responsive .elevenlabs-style {
+    display: none;
+}
+
+.voice-engine-elevenlabs .responsive-voices {
+    display: none;
+}
+
+/* Animation for voice switching */
+@keyframes highlight {
+    0% { background-color: transparent; }
+    50% { background-color: rgba(74, 144, 226, 0.2); }
+    100% { background-color: transparent; }
+}
+
+.highlight-animation {
+    animation: highlight 2s ease-in-out;
 }

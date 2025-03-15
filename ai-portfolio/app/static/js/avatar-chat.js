@@ -1,33 +1,23 @@
-﻿document.addEventListener('DOMContentLoaded', function() {
-    // Initialize the enhanced avatar controller
-    const avatarController = new EnhancedAvatarController();
-    
+﻿document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
-    const avatarContainer = document.getElementById('avatar-container');
-    const speechBubble = document.getElementById('speech-bubble');
-    const speechButton = document.getElementById('speech-button');
+    const chatForm = document.getElementById('chat-form');
     const textInput = document.getElementById('text-input');
     const sendButton = document.getElementById('send-button');
-    const statusDiv = document.getElementById('avatar-status');
+    const speechButton = document.getElementById('speech-button');
+    const speechBubble = document.getElementById('speech-bubble');
+    const statusDisplay = document.getElementById('avatar-status');
     
-    // Debug - Check if elements are found
-    console.log('Avatar container found:', !!avatarContainer);
-    console.log('Speech bubble found:', !!speechBubble);
-    console.log('Text input found:', !!textInput);
-    console.log('Send button found:', !!sendButton);
-    
-    // Check if ResponsiveVoice is available
-    const hasResponsiveVoice = typeof responsiveVoice !== 'undefined';
-    console.log('ResponsiveVoice available:', hasResponsiveVoice);
-    
-    // Initialize Web Speech API as fallback
+    // Flag for voice availability
     const synth = window.speechSynthesis;
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition = null;
+    const hasResponsiveVoice = typeof responsiveVoice !== 'undefined';
+    const hasElevenLabs = typeof window.elevenlabs !== 'undefined';
     
-    if (SpeechRecognition) {
-        recognition = new SpeechRecognition();
+    // Set up speech recognition if available
+    let recognition = null;
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         recognition.continuous = false;
+        recognition.interimResults = false;
         recognition.lang = 'cs-CZ'; // Set to Czech
         console.log('Speech recognition available');
     } else {
@@ -37,195 +27,106 @@
     // Session management
     let sessionId = localStorage.getItem('chatSessionId');
     
-    // Function to speak text using ResponsiveVoice or fallback to Web Speech API
-    function speakText(text) {
-        // Start avatar speaking animation
-        avatarController.startSpeaking(text);
-        
-        // Update the speech bubble
+    // Show speech bubble with text
+    function showSpeechBubble(text) {
         if (speechBubble) {
             speechBubble.textContent = text;
             speechBubble.style.display = 'block';
-        }
-        
-        // Log status
-        if (statusDiv) {
-            statusDiv.innerHTML += '<p>Speaking: ' + text + '</p>';
-        }
-        
-        // Get voice settings from local storage
-        const voiceType = localStorage.getItem('selectedVoice') || "Czech Female";
-        const rate = parseFloat(localStorage.getItem('speechRate') || "1.0");
-        const pitch = parseFloat(localStorage.getItem('speechPitch') || "1.0");
-        
-        console.log('Voice settings:', { voiceType, rate, pitch });
-        
-        // Use ResponsiveVoice if available
-        if (hasResponsiveVoice) {
-            // Cancel any ongoing speech
-            if (responsiveVoice.isPlaying()) {
-                responsiveVoice.cancel();
-            }
             
-            // Speak using selected voice
-            responsiveVoice.speak(text, voiceType, {
-                pitch: pitch,
-                rate: rate,
-                volume: 1,
-                onstart: function() {
-                    console.log('ResponsiveVoice started speaking');
+            // Hide speech bubble after speech ends
+            // We'll let the speakText function handle this via callbacks
+        }
+    }
+    
+    // Hide speech bubble
+    function hideSpeechBubble() {
+        if (speechBubble) {
+            speechBubble.style.display = 'none';
+        }
+    }
+    
+    // Send message to API
+    async function sendMessage(message) {
+        if (!message) return;
+        
+        updateStatus(`Odesílám zprávu: "${message}"`);
+        
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
                 },
-                onend: function() {
-                    console.log('ResponsiveVoice finished speaking');
-                    // Stop avatar animation when speech ends
-                    avatarController.stopSpeaking();
-                    
-                    // Hide speech bubble after a short delay
-                    setTimeout(() => {
-                        if (speechBubble) {
-                            speechBubble.style.display = 'none';
-                        }
-                    }, 1000);
-                },
-                onerror: function(error) {
-                    console.error('ResponsiveVoice error:', error);
-                    // Fallback to Web Speech API if ResponsiveVoice fails
-                    fallbackSpeech(text);
-                }
+                body: JSON.stringify({
+                    message: message,
+                    session_id: sessionId
+                })
             });
-        } else {
-            // Fallback to Web Speech API
-            fallbackSpeech(text);
-        }
-    }
-    
-    // Fallback speech function using Web Speech API
-    function fallbackSpeech(text) {
-        if (synth) {
-            // Cancel any ongoing speech
-            synth.cancel();
             
-            // Create a new utterance
-            const utterance = new SpeechSynthesisUtterance(text);
-            
-            // Set utterance properties
-            utterance.volume = 1;
-            utterance.rate = parseFloat(localStorage.getItem('speechRate') || "1.0");
-            utterance.pitch = parseFloat(localStorage.getItem('speechPitch') || "1.0");
-            utterance.lang = 'cs-CZ'; // Set language to Czech
-            
-            // Events
-            utterance.onend = function() {
-                // Stop avatar animation when speech ends
-                avatarController.stopSpeaking();
-                
-                // Hide speech bubble after a short delay
-                setTimeout(() => {
-                    if (speechBubble) {
-                        speechBubble.style.display = 'none';
-                    }
-                }, 1000);
-            };
-            
-            // Load voices
-            let voices = synth.getVoices();
-            if (voices.length > 0) {
-                // Try to find a Czech voice
-                const czechVoice = voices.find(voice => 
-                    voice.lang.startsWith('cs') || voice.name.includes('Czech')
-                );
-                
-                if (czechVoice) {
-                    utterance.voice = czechVoice;
-                    console.log('Using Czech voice:', czechVoice.name);
-                } else {
-                    // Use any available voice
-                    utterance.voice = voices[0];
-                    console.log('Czech voice not found, using:', voices[0].name);
-                }
-            }
-            
-            // Speak!
-            synth.speak(utterance);
-            console.log('Speaking using Web Speech API:', text);
-        } else {
-            console.warn('Speech synthesis not supported');
-            
-            // Even without speech, run the avatar animation
-            setTimeout(() => {
-                avatarController.stopSpeaking();
-                
-                // Hide speech bubble
-                if (speechBubble) {
-                    speechBubble.style.display = 'none';
-                }
-            }, text.length * 50); // Rough estimate of speech duration
-            
-            if (statusDiv) {
-                statusDiv.innerHTML += '<p>ERROR: Speech synthesis not supported in this browser</p>';
-            }
-        }
-    }
-    
-    // Send message to the backend
-    function sendMessage(message) {
-        // Update status
-        if (statusDiv) {
-            statusDiv.innerHTML += '<p>Sending message: ' + message + '</p>';
-        }
-        
-        fetch('/api/chat', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                message: message,
-                session_id: sessionId || null
-            })
-        })
-        .then(response => {
             if (!response.ok) {
-                throw new Error('API response was not ok: ' + response.status);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Response received:', data);
-            
-            // Save session ID
-            sessionId = data.session_id;
-            localStorage.setItem('chatSessionId', sessionId);
-            
-            // Update status
-            if (statusDiv) {
-                statusDiv.innerHTML += '<p>Response received: ' + data.response + '</p>';
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
             
-            // Respond to sentiment with animation
-            avatarController.respondToSentiment(data.sentiment);
+            const data = await response.json();
             
-            // Speak the response
-            speakText(data.response);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            if (statusDiv) {
-                statusDiv.innerHTML += '<p>ERROR: ' + error.message + '</p>';
+            // Save session ID if provided
+            if (data.session_id) {
+                sessionId = data.session_id;
+                localStorage.setItem('chatSessionId', sessionId);
             }
             
-            // Show concerned expression
-            avatarController.setExpression('confused');
+            // Process response
+            updateStatus(`Přijata odpověď od AI`);
             
-            // Say error message
-            speakText('Omlouvám se, ale narazil jsem na problém. Prosím, zkuste to znovu.');
-        });
+            // Speak the response if available
+            if (data.response) {
+                // Display speech bubble
+                showSpeechBubble(data.response);
+                
+                // Use the global speakText function
+                if (window.speakText) {
+                    window.speakText(data.response);
+                }
+                
+                // Set emotion if available
+                if (data.emotion && window.avatarController) {
+                    window.avatarController.respondToSentiment(data.emotion);
+                }
+            }
+            
+        } catch (error) {
+            console.error('Error sending message:', error);
+            updateStatus(`Chyba: ${error.message}`);
+            
+            // Hide speech bubble on error
+            hideSpeechBubble();
+            
+            // Reset speaking state if there was an error
+            if (window.avatarController) {
+                window.avatarController.stopSpeaking();
+            }
+        }
     }
     
-    // Handle form submission
-    if (textInput && sendButton) {
-        // Form submit event
-        sendButton.addEventListener('click', function(e) {
+    // Update status display
+    function updateStatus(message) {
+        if (statusDisplay) {
+            const timestamp = new Date().toLocaleTimeString();
+            statusDisplay.innerHTML = `<p>[${timestamp}] ${message}</p>` + statusDisplay.innerHTML;
+            
+            // Keep only the last 5 messages
+            const messages = statusDisplay.getElementsByTagName('p');
+            if (messages.length > 5) {
+                for (let i = 5; i < messages.length; i++) {
+                    statusDisplay.removeChild(messages[i]);
+                }
+            }
+        }
+    }
+    
+    // Event Listeners
+    if (chatForm) {
+        chatForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const message = textInput.value.trim();
             if (message) {
@@ -233,111 +134,181 @@
                 textInput.value = '';
             }
         });
-        
-        // Enter key submission
-        textInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const message = textInput.value.trim();
-                if (message) {
-                    sendMessage(message);
-                    textInput.value = '';
-                }
+    }
+    
+    if (sendButton && textInput) {
+        sendButton.addEventListener('click', () => {
+            const message = textInput.value.trim();
+            if (message) {
+                sendMessage(message);
+                textInput.value = '';
             }
         });
     }
     
-    // Voice input
     if (speechButton && recognition) {
-        speechButton.addEventListener('click', function() {
-            // Start speech recognition
-            try {
-                recognition.start();
-                if (statusDiv) {
-                    statusDiv.innerHTML += '<p>Listening for speech input...</p>';
-                }
-                speechButton.classList.add('listening');
+        speechButton.addEventListener('click', () => {
+            updateStatus('Poslouchám...');
+            speechButton.classList.add('listening');
+            
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                textInput.value = transcript;
+                updateStatus(`Rozpoznáno: "${transcript}"`);
                 
-                // Tell avatar to pay attention
-                avatarController.respondToUserSpeaking(true);
-            } catch (e) {
-                console.error('Error starting speech recognition:', e);
-                if (statusDiv) {
-                    statusDiv.innerHTML += '<p>ERROR starting speech recognition: ' + e.message + '</p>';
+                // Auto-submit
+                setTimeout(() => {
+                    sendMessage(transcript);
+                    textInput.value = '';
+                }, 500);
+            };
+            
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error', event.error);
+                updateStatus(`Chyba rozpoznávání: ${event.error}`);
+                speechButton.classList.remove('listening');
+            };
+            
+            recognition.onend = () => {
+                speechButton.classList.remove('listening');
+            };
+            
+            recognition.start();
+        });
+    }
+    
+    // Create enhanced voice test panel
+    function createTestVoicePanel() {
+        // Create container
+        const testPanel = document.createElement('div');
+        testPanel.className = 'voice-test-panel';
+        testPanel.style.cssText = 'margin-top: 20px; background-color: #f0f8ff; padding: 15px; border-radius: 8px; border-left: 4px solid #4a90e2;';
+        
+        // Title
+        const title = document.createElement('h4');
+        title.textContent = 'Test hlasů';
+        title.style.cssText = 'margin-top: 0; margin-bottom: 10px; color: #444;';
+        testPanel.appendChild(title);
+        
+        // Explanation
+        const explanation = document.createElement('p');
+        explanation.innerHTML = `
+            <strong>Tipy pro lepší výsledky:</strong>
+            <ul style="margin-top: 5px; padding-left: 25px;">
+                <li>Pro anime/stylizované hlasy nastavte <strong>Výraznost stylizace</strong> na 0.5-0.8</li>
+                <li>Nezapomeňte nastavit <strong>ElevenLabs API klíč</strong> pro nejlepší hlasy</li>
+                <li>Pro některé hlasy může být lepší nižší <strong>Stabilita</strong> (0.3)</li>
+                <li>Vyzkoušejte různé kombinace nastavení</li>
+            </ul>
+        `;
+        explanation.style.cssText = 'font-size: 13px; margin: 10px 0;';
+        testPanel.appendChild(explanation);
+        
+        // Create test buttons container
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.cssText = 'display: flex; gap: 10px; flex-wrap: wrap;';
+        
+        // Test phrases for different voice types
+        const testPhrases = {
+            'Standard': "Ahoj, jsem virtuální asistent. Jak ti mohu dnes pomoci?",
+            'Emoce': "Wow! To je úžasné! Jsem tak nadšený!",
+            'Anime': "Eeeh?! Sugoi desu! To je neuvěřitelné!",
+            'Vícejazyčné': "Hello! Ahoj! こんにちは! Hola! Guten Tag!"
+        };
+        
+        // Add test buttons
+        Object.keys(testPhrases).forEach(type => {
+            const button = document.createElement('button');
+            button.textContent = `Test: ${type}`;
+            button.className = 'test-voice-btn';
+            button.style.cssText = 'padding: 8px 15px; background-color: #4a90e2; color: white; border: none; border-radius: 4px; cursor: pointer; flex-grow: 1; min-width: 100px; font-size: 14px;';
+            
+            button.addEventListener('click', () => {
+                showSpeechBubble(testPhrases[type]);
+                
+                // Use the global speakText function
+                if (window.speakText) {
+                    window.speakText(testPhrases[type]);
+                }
+                
+                // Set a random expression
+                if (window.avatarController) {
+                    const expressions = ['happy', 'thinking', 'surprised'];
+                    const randomExpression = expressions[Math.floor(Math.random() * expressions.length)];
+                    window.avatarController.respondToSentiment(randomExpression);
+                }
+            });
+            
+            button.addEventListener('mouseover', () => {
+                button.style.backgroundColor = '#3a7bc8';
+            });
+            
+            button.addEventListener('mouseout', () => {
+                button.style.backgroundColor = '#4a90e2';
+            });
+            
+            buttonContainer.appendChild(button);
+        });
+        
+        // Custom test button
+        const customInputContainer = document.createElement('div');
+        customInputContainer.style.cssText = 'margin-top: 10px; display: flex; gap: 10px;';
+        
+        const customInput = document.createElement('input');
+        customInput.type = 'text';
+        customInput.placeholder = 'Vlastní testovací text...';
+        customInput.style.cssText = 'flex-grow: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;';
+        customInputContainer.appendChild(customInput);
+        
+        const customButton = document.createElement('button');
+        customButton.textContent = 'Test';
+        customButton.style.cssText = 'padding: 8px 15px; background-color: #4a90e2; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;';
+        
+        customButton.addEventListener('click', () => {
+            const text = customInput.value.trim();
+            if (text) {
+                showSpeechBubble(text);
+                
+                // Use the global speakText function
+                if (window.speakText) {
+                    window.speakText(text);
+                }
+                
+                // Set a random expression
+                if (window.avatarController) {
+                    const expressions = ['happy', 'thinking', 'surprised'];
+                    const randomExpression = expressions[Math.floor(Math.random() * expressions.length)];
+                    window.avatarController.respondToSentiment(randomExpression);
                 }
             }
         });
         
-        recognition.onresult = function(event) {
-            const transcript = event.results[0][0].transcript;
-            if (textInput) {
-                textInput.value = transcript;
-            }
-            if (statusDiv) {
-                statusDiv.innerHTML += '<p>Speech recognized: ' + transcript + '</p>';
-            }
-            
-            // Auto send after short delay
-            setTimeout(() => {
-                sendMessage(transcript);
-            }, 500);
-            
-            speechButton.classList.remove('listening');
-            
-            // Tell avatar user stopped speaking
-            avatarController.respondToUserSpeaking(false);
-        };
+        customInputContainer.appendChild(customButton);
         
-        recognition.onerror = function(event) {
-            console.error('Speech recognition error:', event.error);
-            if (statusDiv) {
-                statusDiv.innerHTML += '<p>Speech recognition error: ' + event.error + '</p>';
-            }
-            speechButton.classList.remove('listening');
-            
-            // Tell avatar user stopped speaking
-            avatarController.respondToUserSpeaking(false);
-        };
+        // Add elements to panel
+        testPanel.appendChild(buttonContainer);
+        testPanel.appendChild(customInputContainer);
         
-        recognition.onend = function() {
-            speechButton.classList.remove('listening');
-            
-            // Tell avatar user stopped speaking
-            avatarController.respondToUserSpeaking(false);
-        };
+        return testPanel;
     }
     
-    // If there's no session, send an empty message to get a welcome response
-    if (!sessionId) {
-        // Send a special greeting request with slight delay to ensure page is loaded
-        setTimeout(() => {
-            // Make avatar wave to welcome
-            avatarController.performGesture('wave');
-            
-            fetch('/api/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    message: "Ahoj",
-                    session_id: null
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Save session ID
-                sessionId = data.session_id;
-                localStorage.setItem('chatSessionId', sessionId);
-                
-                // Speak the welcome message
-                speakText(data.response);
-            })
-            .catch(error => {
-                console.error('Error getting welcome message:', error);
-                // Fallback welcome message
-                speakText("Ahoj! Jsem Jan Novák. Rád tě poznávám! Co bys chtěl vědět o mých projektech?");
-            });
-        }, 1000);
+    // Add the voice test panel after the voice controls
+    const voiceControls = document.querySelector('.voice-control-panel');
+    if (voiceControls && chatForm) {
+        const testPanel = createTestVoicePanel();
+        voiceControls.after(testPanel);
+    }
+    
+    // Initialization status
+    updateStatus('Avatar chat initialized');
+    
+    if (hasElevenLabs) {
+        updateStatus('ElevenLabs voice engine dostupný');
+    } else if (hasResponsiveVoice) {
+        updateStatus('ResponsiveVoice engine dostupný');
+    } else if (synth) {
+        updateStatus('Web Speech API dostupný');
+    } else {
+        updateStatus('Žádný hlasový engine není dostupný');
     }
 });
