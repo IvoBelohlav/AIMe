@@ -49,16 +49,6 @@
   100% { transform: translateY(0); }
 }
 
-@keyframes pointRight {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(20deg); }
-}
-
-@keyframes pointLeft {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(-20deg); }
-}
-
 @keyframes excited {
   0% { transform: rotate(0deg) translateY(0); }
   25% { transform: rotate(3deg) translateY(-5px); }
@@ -97,16 +87,6 @@
 
 #right-arm.shrug, #left-arm.shrug {
   animation: shrug 1.5s ease-in-out;
-}
-
-#right-forearm.point {
-  animation: pointRight 0.5s ease-in-out forwards;
-  transform-origin: top;
-}
-
-#left-forearm.point {
-  animation: pointLeft 0.5s ease-in-out forwards;
-  transform-origin: top;
 }
 
 #avatar-main.excited {
@@ -178,20 +158,4 @@
 
 .expression-thinking #right-eyebrow {
   d: path('M160,90 Q180,80 200,90');
-}
-
-.expression-angry #left-eyebrow {
-  d: path('M100,95 Q120,85 140,90');
-}
-
-.expression-angry #right-eyebrow {
-  d: path('M160,90 Q180,85 200,95');
-}
-
-.expression-confused #left-eyebrow {
-  d: path('M100,90 Q120,85 140,95');
-}
-
-.expression-confused #right-eyebrow {
-  d: path('M160,95 Q180,85 200,90');
 }

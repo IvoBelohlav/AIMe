@@ -1,5 +1,5 @@
-﻿// Voice control functionality
-document.addEventListener('DOMContentLoaded', function() {
+﻿document.addEventListener('DOMContentLoaded', function() {
+    // Voice control elements
     const voiceSelect = document.getElementById('voice-select');
     const rateSlider = document.getElementById('rate-slider');
     const rateValue = document.getElementById('rate-value');
@@ -7,34 +7,70 @@ document.addEventListener('DOMContentLoaded', function() {
     const pitchValue = document.getElementById('pitch-value');
     const testVoiceBtn = document.getElementById('test-voice-btn');
     
-    // Skip if elements don't exist
+    // Check if elements exist
     if (!voiceSelect || !rateSlider || !pitchSlider || !testVoiceBtn) {
-        console.log('Voice control elements not found');
+        console.warn('Voice control elements not found');
         return;
     }
     
-    console.log('Voice controls initialized');
+    // Initialize ResponsiveVoice check
+    const hasResponsiveVoice = typeof responsiveVoice !== 'undefined';
     
-    // Initialize from localStorage if available
-    const savedVoice = localStorage.getItem('selectedVoice');
-    const savedRate = localStorage.getItem('speechRate');
-    const savedPitch = localStorage.getItem('speechPitch');
-    
-    if (savedVoice) {
-        voiceSelect.value = savedVoice;
+    // Load saved settings from localStorage
+    function loadSavedSettings() {
+        // Voice type
+        const savedVoice = localStorage.getItem('selectedVoice');
+        if (savedVoice) {
+            // Find and select the saved voice
+            for (let i = 0; i < voiceSelect.options.length; i++) {
+                if (voiceSelect.options[i].value === savedVoice) {
+                    voiceSelect.selectedIndex = i;
+                    break;
+                }
+            }
+        }
+        
+        // Rate
+        const savedRate = localStorage.getItem('speechRate');
+        if (savedRate) {
+            rateSlider.value = savedRate;
+            rateValue.textContent = savedRate;
+        }
+        
+        // Pitch
+        const savedPitch = localStorage.getItem('speechPitch');
+        if (savedPitch) {
+            pitchSlider.value = savedPitch;
+            pitchValue.textContent = savedPitch;
+        }
     }
     
-    if (savedRate) {
-        rateSlider.value = savedRate;
-        rateValue.textContent = savedRate;
+    // Initialize voice settings
+    function initVoiceSettings() {
+        // Set default values if not already in localStorage
+        if (!localStorage.getItem('selectedVoice')) {
+            localStorage.setItem('selectedVoice', 'Czech Female');
+        }
+        
+        if (!localStorage.getItem('speechRate')) {
+            localStorage.setItem('speechRate', '1.0');
+        }
+        
+        if (!localStorage.getItem('speechPitch')) {
+            localStorage.setItem('speechPitch', '1.0');
+        }
+        
+        // Load saved settings
+        loadSavedSettings();
+        
+        console.log('Voice controls initialized with settings:', {
+            voice: localStorage.getItem('selectedVoice'),
+            rate: localStorage.getItem('speechRate'),
+            pitch: localStorage.getItem('speechPitch')
+        });
     }
     
-    if (savedPitch) {
-        pitchSlider.value = savedPitch;
-        pitchValue.textContent = savedPitch;
-    }
-    
-    // Update voice settings in real-time
+    // Add event listeners
     voiceSelect.addEventListener('change', function() {
         localStorage.setItem('selectedVoice', voiceSelect.value);
         console.log('Voice changed to:', voiceSelect.value);
@@ -43,34 +79,79 @@ document.addEventListener('DOMContentLoaded', function() {
     rateSlider.addEventListener('input', function() {
         rateValue.textContent = rateSlider.value;
         localStorage.setItem('speechRate', rateSlider.value);
-        console.log('Rate changed to:', rateSlider.value);
     });
     
     pitchSlider.addEventListener('input', function() {
         pitchValue.textContent = pitchSlider.value;
         localStorage.setItem('speechPitch', pitchSlider.value);
-        console.log('Pitch changed to:', pitchSlider.value);
     });
     
     // Test voice button
     testVoiceBtn.addEventListener('click', function() {
-        const testText = "Ahoj, takhle bude znít můj hlas. Jak se ti to líbí?";
-        console.log('Testing voice with:', testText);
+        const testPhrase = "Ahoj, takhle bude znít můj hlas. Jak se ti to líbí?";
         
-        if (typeof responsiveVoice !== 'undefined') {
-            responsiveVoice.speak(testText, voiceSelect.value, {
+        // Access the avatarController if available
+        if (window.avatarController) {
+            window.avatarController.startSpeaking(testPhrase);
+        }
+        
+        if (hasResponsiveVoice) {
+            // Test with ResponsiveVoice
+            responsiveVoice.speak(testPhrase, voiceSelect.value, {
                 pitch: parseFloat(pitchSlider.value),
-                rate: parseFloat(rateSlider.value)
+                rate: parseFloat(rateSlider.value),
+                onend: function() {
+                    if (window.avatarController) {
+                        window.avatarController.stopSpeaking();
+                    }
+                }
             });
-            console.log('Using ResponsiveVoice with:', voiceSelect.value);
         } else {
             // Fallback to Web Speech API
+            console.log('Testing voice with:', testPhrase);
             console.log('ResponsiveVoice not available, using Web Speech API');
-            const utterance = new SpeechSynthesisUtterance(testText);
-            utterance.lang = 'cs-CZ';
-            utterance.rate = parseFloat(rateSlider.value);
-            utterance.pitch = parseFloat(pitchSlider.value);
-            speechSynthesis.speak(utterance);
+            
+            if (window.speechSynthesis) {
+                // Clear any ongoing speech
+                window.speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(testPhrase);
+                utterance.lang = 'cs-CZ';
+                utterance.rate = parseFloat(rateSlider.value);
+                utterance.pitch = parseFloat(pitchSlider.value);
+                
+                // Try to find Czech voice
+                const voices = window.speechSynthesis.getVoices();
+                const czechVoice = voices.find(voice => 
+                    voice.lang.startsWith('cs') || voice.name.includes('Czech')
+                );
+                
+                if (czechVoice) {
+                    utterance.voice = czechVoice;
+                    console.log('Using Czech voice:', czechVoice.name);
+                }
+                
+                utterance.onend = function() {
+                    if (window.avatarController) {
+                        window.avatarController.stopSpeaking();
+                    }
+                };
+                
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.error('Speech synthesis not supported in this browser');
+                
+                // Still animate mouth even without sound
+                if (window.avatarController) {
+                    setTimeout(() => {
+                        window.avatarController.stopSpeaking();
+                    }, 3000);
+                }
+            }
         }
     });
+    
+    // Initialize settings
+    initVoiceSettings();
+    console.log('Voice controls initialized');
 });

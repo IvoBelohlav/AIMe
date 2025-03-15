@@ -1,75 +1,83 @@
-﻿<!-- Directly embed SVG instead of using object tag for better DOM access -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400" id="avatar">
-  <!-- Head -->
-  <ellipse id="head" cx="150" cy="120" rx="70" ry="90" fill="#daa17f" />
-  
-  <!-- Hair -->
-  <path id="hair" d="M150,30 C100,30 70,60 70,100 C70,120 80,140 90,150 C90,130 100,120 110,110 C110,140 130,150 150,150 C170,150 190,140 190,110 C200,120 210,130 210,150 C220,140 230,120 230,100 C230,60 200,30 150,30 Z" fill="#2b1700" />
-  
-  <!-- Eyes -->
-  <g id="eyes">
-    <g id="left-eye">
-      <ellipse cx="120" cy="110" rx="15" ry="10" fill="white" />
-      <circle id="left-pupil" cx="120" cy="110" r="5" fill="#301000" />
-      <path id="left-eyebrow" d="M100,95 Q120,85 140,95" fill="none" stroke="#2b1700" stroke-width="3" />
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400" id="avatar">
+  <!-- Main avatar group -->
+  <g id="avatar-main">
+    <!-- Body -->
+    <g id="body">
+      <!-- Torso -->
+      <rect id="torso" x="100" y="220" width="100" height="100" rx="20" fill="#3f51b5" />
+      
+      <!-- Arms -->
+      <g id="arms">
+        <!-- Left arm -->
+        <g id="left-arm">
+          <path id="left-upper-arm" d="M100,240 L80,290" stroke="#daa17f" stroke-width="20" stroke-linecap="round" fill="none" />
+          <g id="left-forearm">
+            <path d="M80,290 L70,340" stroke="#daa17f" stroke-width="18" stroke-linecap="round" fill="none" />
+          </g>
+        </g>
+        
+        <!-- Right arm -->
+        <g id="right-arm">
+          <path id="right-upper-arm" d="M200,240 L220,290" stroke="#daa17f" stroke-width="20" stroke-linecap="round" fill="none" />
+          <g id="right-forearm">
+            <path d="M220,290 L230,340" stroke="#daa17f" stroke-width="18" stroke-linecap="round" fill="none" />
+          </g>
+        </g>
+      </g>
+      
+      <!-- Legs -->
+      <g id="legs">
+        <path id="left-leg" d="M125,320 L115,400" stroke="#374046" stroke-width="25" stroke-linecap="round" fill="none" />
+        <path id="right-leg" d="M175,320 L185,400" stroke="#374046" stroke-width="25" stroke-linecap="round" fill="none" />
+      </g>
     </g>
-    <g id="right-eye">
-      <ellipse cx="180" cy="110" rx="15" ry="10" fill="white" />
-      <circle id="right-pupil" cx="180" cy="110" r="5" fill="#301000" />
-      <path id="right-eyebrow" d="M160,95 Q180,85 200,95" fill="none" stroke="#2b1700" stroke-width="3" />
-    </g>
-  </g>
-  
-  <!-- Glasses -->
-  <g id="glasses">
-    <rect x="100" y="105" width="40" height="25" rx="5" ry="5" fill="none" stroke="#444" stroke-width="2" />
-    <rect x="160" y="105" width="40" height="25" rx="5" ry="5" fill="none" stroke="#444" stroke-width="2" />
-    <line x1="140" y1="115" x2="160" y2="115" stroke="#444" stroke-width="2" />
-    <line x1="98" y1="110" x2="80" y2="105" stroke="#444" stroke-width="2" />
-    <line x1="202" y1="110" x2="220" y2="105" stroke="#444" stroke-width="2" />
-  </g>
-  
-  <!-- Nose -->
-  <path id="nose" d="M150,115 Q155,140 145,140" fill="none" stroke="#a37e65" stroke-width="2" />
-  
-  <!-- Mouth (with different states for animation) -->
-  <g id="mouth">
-    <path id="mouth-closed" d="M120,160 Q150,170 180,160" fill="none" stroke="#8c5a46" stroke-width="3" display="block" />
-    <path id="mouth-a" d="M120,160 Q150,180 180,160 Q150,190 120,160" fill="#701f29" stroke="#8c5a46" stroke-width="2" display="none" />
-    <path id="mouth-e" d="M120,160 Q150,175 180,160 Q150,185 120,160" fill="#701f29" stroke="#8c5a46" stroke-width="2" display="none" />
-    <path id="mouth-i" d="M130,160 Q150,165 170,160 Q150,170 130,160" fill="#701f29" stroke="#8c5a46" stroke-width="2" display="none" />
-    <path id="mouth-o" d="M130,160 Q150,175 170,160 Q150,190 130,160" fill="#701f29" stroke="#8c5a46" stroke-width="2" display="none" />
-    <path id="mouth-u" d="M130,160 Q150,170 170,160 Q150,180 130,160" fill="#701f29" stroke="#8c5a46" stroke-width="2" display="none" />
-  </g>
-  
-  <!-- Neck -->
-  <rect id="neck" x="135" y="200" width="30" height="30" fill="#daa17f" />
-  
-  <!-- Body - Torso (showing just the top part) -->
-  <path id="torso" d="M100,230 L135,230 L135,220 L165,220 L165,230 L200,230 L200,300 L100,300" fill="#3f51b5" />
-  
-  <!-- Arms (can be animated) -->
-  <g id="arms">
-    <path id="left-arm" d="M100,240 C80,260 70,280 75,320" fill="none" stroke="#daa17f" stroke-width="20" stroke-linecap="round" />
-    <path id="right-arm" d="M200,240 C220,260 230,280 225,320" fill="none" stroke="#daa17f" stroke-width="20" stroke-linecap="round" />
-  </g>
-  
-  <!-- Expressions to be shown/hidden -->
-  <g id="expressions" display="none">
-    <g id="expression-happy">
-      <path d="M120,135 Q150,155 180,135" fill="none" stroke="#8c5a46" stroke-width="3" />
-      <path d="M110,100 Q120,90 130,100" fill="none" stroke="#301000" stroke-width="2" />
-      <path d="M170,100 Q180,90 190,100" fill="none" stroke="#301000" stroke-width="2" />
-    </g>
-    <g id="expression-thinking">
-      <path d="M120,165 L180,165" fill="none" stroke="#8c5a46" stroke-width="3" />
-      <circle cx="180" cy="140" r="5" fill="none" stroke="#301000" stroke-width="2" />
-      <path d="M110,90 Q120,100 130,90" fill="none" stroke="#301000" stroke-width="2" />
-    </g>
-    <g id="expression-surprised">
-      <circle cx="150" cy="160" r="15" fill="#701f29" stroke="#8c5a46" stroke-width="2" />
-      <ellipse cx="120" cy="110" rx="15" ry="15" fill="white" />
-      <ellipse cx="180" cy="110" rx="15" ry="15" fill="white" />
+
+    <!-- Head group -->
+    <g id="head-group">
+      <!-- Base head -->
+      <ellipse id="head" cx="150" cy="120" rx="70" ry="90" fill="#daa17f" />
+      
+      <!-- Neck -->
+      <rect id="neck" x="135" y="200" width="30" height="30" fill="#daa17f" />
+      
+      <!-- Hair -->
+      <path id="hair" d="M150,30 C100,30 70,60 70,100 C70,120 80,140 90,150 C90,130 100,120 110,110 C110,140 130,150 150,150 C170,150 190,140 190,110 C200,120 210,130 210,150 C220,140 230,120 230,100 C230,60 200,30 150,30 Z" fill="#2b1700" />
+      
+      <!-- Eyes -->
+      <g id="eyes">
+        <!-- Left eye -->
+        <g id="left-eye">
+          <ellipse cx="120" cy="110" rx="15" ry="10" fill="white" stroke="#888" stroke-width="0.5" />
+          <circle id="left-pupil" cx="120" cy="110" r="5" fill="#301000" />
+          <path id="left-eyebrow" d="M100,95 Q120,85 140,95" fill="none" stroke="#2b1700" stroke-width="3" />
+          <path id="left-eyelid" d="M105,110 Q120,110 135,110" stroke="#daa17f" fill="#daa17f" stroke-width="20" opacity="0" />
+        </g>
+        
+        <!-- Right eye -->
+        <g id="right-eye">
+          <ellipse cx="180" cy="110" rx="15" ry="10" fill="white" stroke="#888" stroke-width="0.5" />
+          <circle id="right-pupil" cx="180" cy="110" r="5" fill="#301000" />
+          <path id="right-eyebrow" d="M160,95 Q180,85 200,95" fill="none" stroke="#2b1700" stroke-width="3" />
+          <path id="right-eyelid" d="M165,110 Q180,110 195,110" stroke="#daa17f" fill="#daa17f" stroke-width="20" opacity="0" />
+        </g>
+      </g>
+      
+      <!-- Nose -->
+      <path id="nose" d="M150,115 Q155,140 145,140" fill="none" stroke="#a37e65" stroke-width="2" />
+      
+      <!-- Mouth -->
+      <g id="mouth-group">
+        <path id="mouth-current" d="M120,160 Q150,170 180,160" fill="none" stroke="#8c5a46" stroke-width="3" />
+      </g>
+      
+      <!-- Glasses -->
+      <g id="glasses">
+        <rect x="100" y="105" width="40" height="25" rx="5" ry="5" fill="none" stroke="#444" stroke-width="2" />
+        <rect x="160" y="105" width="40" height="25" rx="5" ry="5" fill="none" stroke="#444" stroke-width="2" />
+        <line x1="140" y1="115" x2="160" y2="115" stroke="#444" stroke-width="2" />
+        <line x1="98" y1="110" x2="80" y2="105" stroke="#444" stroke-width="2" />
+        <line x1="202" y1="110" x2="220" y2="105" stroke="#444" stroke-width="2" />
+      </g>
     </g>
   </g>
 </svg>

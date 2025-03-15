@@ -1,20 +1,29 @@
 ﻿document.addEventListener('DOMContentLoaded', function() {
-    // Initialize the enhanced avatar controller
-    const avatarController = new EnhancedAvatarController();
+    console.log('DOM content loaded, initializing avatar controller');
     
-    // DOM Elements
-    const avatarContainer = document.getElementById('avatar-container');
+    // Initialize controller with proper error handling
+    try {
+        // Make sure the EnhancedAvatarController class is loaded
+        if (typeof EnhancedAvatarController === 'undefined') {
+            console.error('EnhancedAvatarController class not found. Check script loading order.');
+            return;
+        }
+        
+        // Create controller instance
+        const avatarController = new EnhancedAvatarController();
+        
+        // Explicitly assign to window object
+        window.avatarController = avatarController;
+        console.log('Avatar controller initialized and assigned to window.avatarController');
+    } catch (error) {
+        console.error('Error initializing avatar controller:', error);
+    }
+    
+    // Rest of your avatar-chat.js code...
     const speechBubble = document.getElementById('speech-bubble');
     const speechButton = document.getElementById('speech-button');
     const textInput = document.getElementById('text-input');
     const sendButton = document.getElementById('send-button');
-    const statusDiv = document.getElementById('avatar-status');
-    
-    // Debug - Check if elements are found
-    console.log('Avatar container found:', !!avatarContainer);
-    console.log('Speech bubble found:', !!speechBubble);
-    console.log('Text input found:', !!textInput);
-    console.log('Send button found:', !!sendButton);
     
     // Check if ResponsiveVoice is available
     const hasResponsiveVoice = typeof responsiveVoice !== 'undefined';
@@ -37,31 +46,29 @@
     // Session management
     let sessionId = localStorage.getItem('chatSessionId');
     
-    // Function to speak text using ResponsiveVoice or fallback to Web Speech API
+    // Function to speak text
     function speakText(text) {
-        // Start avatar speaking animation
-        avatarController.startSpeaking(text);
+        if (!text) return;
         
-        // Update the speech bubble
+        // Access avatarController safely
+        const controller = window.avatarController;
+        if (controller) {
+            controller.startSpeaking(text);
+        }
+        
+        // Show speech bubble
         if (speechBubble) {
             speechBubble.textContent = text;
             speechBubble.style.display = 'block';
         }
         
-        // Log status
-        if (statusDiv) {
-            statusDiv.innerHTML += '<p>Speaking: ' + text + '</p>';
-        }
-        
-        // Get voice settings from local storage
-        const voiceType = localStorage.getItem('selectedVoice') || "Czech Female";
-        const rate = parseFloat(localStorage.getItem('speechRate') || "1.0");
-        const pitch = parseFloat(localStorage.getItem('speechPitch') || "1.0");
-        
-        console.log('Voice settings:', { voiceType, rate, pitch });
-        
         // Use ResponsiveVoice if available
         if (hasResponsiveVoice) {
+            // Get voice settings
+            const voiceType = localStorage.getItem('selectedVoice') || "Czech Female";
+            const rate = parseFloat(localStorage.getItem('speechRate') || "1.0");
+            const pitch = parseFloat(localStorage.getItem('speechPitch') || "1.0");
+            
             // Cancel any ongoing speech
             if (responsiveVoice.isPlaying()) {
                 responsiveVoice.cancel();
@@ -72,13 +79,10 @@
                 pitch: pitch,
                 rate: rate,
                 volume: 1,
-                onstart: function() {
-                    console.log('ResponsiveVoice started speaking');
-                },
                 onend: function() {
-                    console.log('ResponsiveVoice finished speaking');
-                    // Stop avatar animation when speech ends
-                    avatarController.stopSpeaking();
+                    if (controller) {
+                        controller.stopSpeaking();
+                    }
                     
                     // Hide speech bubble after a short delay
                     setTimeout(() => {
@@ -86,40 +90,24 @@
                             speechBubble.style.display = 'none';
                         }
                     }, 1000);
-                },
-                onerror: function(error) {
-                    console.error('ResponsiveVoice error:', error);
-                    // Fallback to Web Speech API if ResponsiveVoice fails
-                    fallbackSpeech(text);
                 }
             });
-        } else {
+        } else if (synth) {
             // Fallback to Web Speech API
-            fallbackSpeech(text);
-        }
-    }
-    
-    // Fallback speech function using Web Speech API
-    function fallbackSpeech(text) {
-        if (synth) {
-            // Cancel any ongoing speech
             synth.cancel();
             
-            // Create a new utterance
             const utterance = new SpeechSynthesisUtterance(text);
-            
-            // Set utterance properties
             utterance.volume = 1;
             utterance.rate = parseFloat(localStorage.getItem('speechRate') || "1.0");
             utterance.pitch = parseFloat(localStorage.getItem('speechPitch') || "1.0");
-            utterance.lang = 'cs-CZ'; // Set language to Czech
+            utterance.lang = 'cs-CZ';
             
-            // Events
             utterance.onend = function() {
-                // Stop avatar animation when speech ends
-                avatarController.stopSpeaking();
+                if (controller) {
+                    controller.stopSpeaking();
+                }
                 
-                // Hide speech bubble after a short delay
+                // Hide speech bubble
                 setTimeout(() => {
                     if (speechBubble) {
                         speechBubble.style.display = 'none';
@@ -127,192 +115,102 @@
                 }, 1000);
             };
             
-            // Load voices
-            let voices = synth.getVoices();
-            if (voices.length > 0) {
-                // Try to find a Czech voice
-                const czechVoice = voices.find(voice => 
-                    voice.lang.startsWith('cs') || voice.name.includes('Czech')
-                );
-                
-                if (czechVoice) {
-                    utterance.voice = czechVoice;
-                    console.log('Using Czech voice:', czechVoice.name);
-                } else {
-                    // Use any available voice
-                    utterance.voice = voices[0];
-                    console.log('Czech voice not found, using:', voices[0].name);
-                }
-            }
-            
-            // Speak!
             synth.speak(utterance);
-            console.log('Speaking using Web Speech API:', text);
         } else {
-            console.warn('Speech synthesis not supported');
+            console.warn('No speech synthesis available');
             
-            // Even without speech, run the avatar animation
+            // Still animate avatar
             setTimeout(() => {
-                avatarController.stopSpeaking();
+                if (controller) {
+                    controller.stopSpeaking();
+                }
                 
-                // Hide speech bubble
                 if (speechBubble) {
                     speechBubble.style.display = 'none';
                 }
-            }, text.length * 50); // Rough estimate of speech duration
-            
-            if (statusDiv) {
-                statusDiv.innerHTML += '<p>ERROR: Speech synthesis not supported in this browser</p>';
-            }
+            }, text.length * 50);
         }
     }
     
-    // Send message to the backend
-    function sendMessage(message) {
-        // Update status
-        if (statusDiv) {
-            statusDiv.innerHTML += '<p>Sending message: ' + message + '</p>';
-        }
+    // Test buttons event listeners
+    const testButtons = document.querySelectorAll('.test-button');
+    if (testButtons.length > 0) {
+        console.log('Setting up test buttons:', testButtons.length);
         
-        fetch('/api/chat', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                message: message,
-                session_id: sessionId || null
-            })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('API response was not ok: ' + response.status);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Response received:', data);
-            
-            // Save session ID
-            sessionId = data.session_id;
-            localStorage.setItem('chatSessionId', sessionId);
-            
-            // Update status
-            if (statusDiv) {
-                statusDiv.innerHTML += '<p>Response received: ' + data.response + '</p>';
-            }
-            
-            // Respond to sentiment with animation
-            avatarController.respondToSentiment(data.sentiment);
-            
-            // Speak the response
-            speakText(data.response);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            if (statusDiv) {
-                statusDiv.innerHTML += '<p>ERROR: ' + error.message + '</p>';
-            }
-            
-            // Show concerned expression
-            avatarController.setExpression('confused');
-            
-            // Say error message
-            speakText('Omlouvám se, ale narazil jsem na problém. Prosím, zkuste to znovu.');
+        testButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const gesture = this.getAttribute('data-gesture');
+                const expression = this.getAttribute('data-expression');
+                
+                const controller = window.avatarController;
+                if (!controller) {
+                    console.error('Avatar controller not found');
+                    return;
+                }
+                
+                console.log('Test button clicked:', { gesture, expression });
+                
+                if (gesture) {
+                    controller.performGesture(gesture);
+                }
+                
+                if (expression) {
+                    controller.setExpression(expression);
+                }
+            });
         });
     }
     
-    // Handle form submission
-    if (textInput && sendButton) {
-        // Form submit event
-        sendButton.addEventListener('click', function(e) {
-            e.preventDefault();
+    // Setup send button if available
+    if (sendButton && textInput) {
+        sendButton.addEventListener('click', function() {
             const message = textInput.value.trim();
             if (message) {
-                sendMessage(message);
+                // Send message to backend
+                fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        session_id: sessionId || null
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Save session ID
+                    sessionId = data.session_id;
+                    localStorage.setItem('chatSessionId', sessionId);
+                    
+                    // Speak the response
+                    speakText(data.response);
+                    
+                    // Set sentiment response
+                    const controller = window.avatarController;
+                    if (controller) {
+                        controller.respondToSentiment(data.sentiment || 'neutral');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    speakText('Omlouvám se, ale narazil jsem na problém. Prosím, zkuste to znovu.');
+                });
+                
+                // Clear input
                 textInput.value = '';
             }
         });
-        
-        // Enter key submission
-        textInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const message = textInput.value.trim();
-                if (message) {
-                    sendMessage(message);
-                    textInput.value = '';
-                }
-            }
-        });
-    }
-    
-    // Voice input
-    if (speechButton && recognition) {
-        speechButton.addEventListener('click', function() {
-            // Start speech recognition
-            try {
-                recognition.start();
-                if (statusDiv) {
-                    statusDiv.innerHTML += '<p>Listening for speech input...</p>';
-                }
-                speechButton.classList.add('listening');
-                
-                // Tell avatar to pay attention
-                avatarController.respondToUserSpeaking(true);
-            } catch (e) {
-                console.error('Error starting speech recognition:', e);
-                if (statusDiv) {
-                    statusDiv.innerHTML += '<p>ERROR starting speech recognition: ' + e.message + '</p>';
-                }
-            }
-        });
-        
-        recognition.onresult = function(event) {
-            const transcript = event.results[0][0].transcript;
-            if (textInput) {
-                textInput.value = transcript;
-            }
-            if (statusDiv) {
-                statusDiv.innerHTML += '<p>Speech recognized: ' + transcript + '</p>';
-            }
-            
-            // Auto send after short delay
-            setTimeout(() => {
-                sendMessage(transcript);
-            }, 500);
-            
-            speechButton.classList.remove('listening');
-            
-            // Tell avatar user stopped speaking
-            avatarController.respondToUserSpeaking(false);
-        };
-        
-        recognition.onerror = function(event) {
-            console.error('Speech recognition error:', event.error);
-            if (statusDiv) {
-                statusDiv.innerHTML += '<p>Speech recognition error: ' + event.error + '</p>';
-            }
-            speechButton.classList.remove('listening');
-            
-            // Tell avatar user stopped speaking
-            avatarController.respondToUserSpeaking(false);
-        };
-        
-        recognition.onend = function() {
-            speechButton.classList.remove('listening');
-            
-            // Tell avatar user stopped speaking
-            avatarController.respondToUserSpeaking(false);
-        };
     }
     
     // If there's no session, send an empty message to get a welcome response
     if (!sessionId) {
-        // Send a special greeting request with slight delay to ensure page is loaded
+        // Delay to ensure everything is loaded
         setTimeout(() => {
-            // Make avatar wave to welcome
-            avatarController.performGesture('wave');
+            const controller = window.avatarController;
+            if (controller) {
+                controller.performGesture('wave');
+            }
             
             fetch('/api/chat', {
                 method: 'POST',
@@ -335,7 +233,6 @@
             })
             .catch(error => {
                 console.error('Error getting welcome message:', error);
-                // Fallback welcome message
                 speakText("Ahoj! Jsem Jan Novák. Rád tě poznávám! Co bys chtěl vědět o mých projektech?");
             });
         }, 1000);
